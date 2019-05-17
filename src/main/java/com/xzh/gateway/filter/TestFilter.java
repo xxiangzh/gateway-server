@@ -32,14 +32,14 @@ public class TestFilter extends ZuulFilter {
     public Object run() {
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
-        String userId = request.getParameter("userId");
-        //如果用户id<=0就返回401
-        if(Long.valueOf(userId) <= 0) {
-            context.setSendZuulResponse(false);
-            context.setResponseStatusCode(401);
-            context.setResponseBody("failed!");
-            return null;
-        }
+//        String userId = request.getParameter("userId");
+//        //如果用户id<=0就返回401
+//        if(Long.valueOf(userId) <= 0) {
+//            context.setSendZuulResponse(false);
+//            context.setResponseStatusCode(401);
+//            context.setResponseBody("failed!");
+//            return null;
+//        }
         return null;
     }
 }
