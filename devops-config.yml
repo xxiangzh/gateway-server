@@ -1,0 +1,90 @@
+# ****************项目工程配置*********************
+#工程名称
+projectName: gateway-server
+# jar版本
+jarVersion: 1.0.0
+# 业务版本号
+businessVersion: v1.0.0
+# 是否有上下文
+hasContext: false
+
+
+# ****************docker镜像相关配置*********************
+# 镜像仓库命名空间
+dockerImageRepoNameSpace: property-mg-tp
+# Jfrog仓库名称(不建议修改)
+jfogServiceName: Poly-IU-MG
+
+#******************容器编排设置*****************************
+k8s:
+  label:
+    key: node
+    value: poly
+  env:
+      test:
+          # 命名空间((不建议修改))
+          nameSpace: mg-tp-test
+          # 应用容器端口
+          appContainerPort: 8004
+          # 创建实例数量(不建议修改)
+          instanceNum: 1
+          # JAVA_OPTS
+          javaOpts: -Xmx400m
+          # 分布式配置中心
+          acm:
+            group: com.poly.iu.mg
+            endpoint: acm.aliyun.com
+            fileExtension: yaml
+            namespace: xxx
+            ramRoleName: KubernetesWorkerRole-zzz
+      uat:
+          # 命名空间(不建议修改)
+          nameSpace: mg-tp-uat
+          # 应用容器端口
+          appContainerPort: 8004
+          # 对外暴露端口(30000-32700之间)
+          outputPort: 30508
+          # 创建实例数量(不建议修改)
+          instanceNum: 1
+          # JAVA_OPTS
+          javaOpts: -Xmx400m
+          # 分布式配置中心
+          acm:
+            group: com.poly.iu.mg
+            endpoint: addr-sz-internal.edas.aliyun.com
+            fileExtension: yaml
+            namespace: xxx
+            ramRoleName: KubernetesWorkerRole-zzz
+      prod:
+          # 命名空间(不建议修改)
+          nameSpace: data-center
+          # 应用容器端口
+          appContainerPort: 8004
+          # 对外暴露端口(30000-32700之间)
+          outputPort: 30505
+          # 创建实例数量(不建议修改)
+          instanceNum: 3
+          # JAVA_OPTS
+          javaOpts: ''
+          # 分布式配置中心
+          acm:
+            group: com.poly.iu.mg
+            endpoint: addr-sz-internal.edas.aliyun.com
+            fileExtension: yaml
+            namespace: xxx
+            ramRoleName: KubernetesWorkerRole-zzz
+# 自动化测试配置
+testShell:
+          # 脚本地址(一定要带.git)
+          git: http://localhost:8062/test/property_cloud_platform.git
+          # 脚本地址凭证
+          gitCredentialsId: xxx
+          # 脚本文件位置
+          filePath: interfaceTest
+email:
+    # 测试负责人邮件
+    tester: anenan@qq.com
+    # 上线运维负责人邮件
+    publisher: anenan@qq.com
+
+

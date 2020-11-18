@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: 统一门户
+          uri: lb://security-auth2
+          predicates:
+            - Path=/security-auth2/**
+          filters:
+            - Login=/*/oauth/token;/*/item/syn
+            - Resource=/*/oauth/token;/*/item/syn
+        - id: 主数据
+          uri: lb://basic-info
+          predicates:
+            - Path=/basic-info/**
+          filters:
+            - Login

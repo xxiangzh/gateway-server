@@ -1,17 +1,21 @@
 package com.xzh.gateway;
 
+
 import org.springframework.boot.SpringApplication;
-import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
- * @author 向振华
- * @date 2019/05/08 16:25
+ * @description: 服务启动类
+ * @author: 向振华
+ * @date: 2020/06/01 11:11
  */
-@EnableZuulProxy
-@SpringCloudApplication
+@EnableDiscoveryClient
+@SpringBootApplication
 public class Application {
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
+
 }
