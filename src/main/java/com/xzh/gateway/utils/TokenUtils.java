@@ -1,100 +1,72 @@
 package com.xzh.gateway.utils;
 
-import com.xzh.gateway.common.Constant;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.xzh.gateway.entity.Constant;
+import com.xzh.gateway.error.BusinessException;
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.util.Date;
-import java.util.List;
+import org.springframework.web.server.ServerWebExchange;
 
 /**
  * Token工具
  *
  * @author 向振华
- * @date 2020/09/08 09:48
+ * @date 2021/01/15 15:52
  */
+@Slf4j
 @Component
 public class TokenUtils {
 
-    public static String jwtSigning;
+    public static String jwtSigningKey;
 
-    @Value("${custom.sso.jwtSigningKey}")
-    public void setJwtSigning(String jwtSigning) {
-        TokenUtils.jwtSigning = jwtSigning;
+    @Value("${jwt.signing.key}")
+    public void setJwtSigning(String jwtSigningKey) {
+        TokenUtils.jwtSigningKey = jwtSigningKey;
     }
 
     /**
-     * 获取token
+     * 验证并获取
      *
-     * @param serverHttpRequest
+     * @param exchange
      * @return
      */
-    public static String getToken(ServerHttpRequest serverHttpRequest) {
-        List<String> authorizations = serverHttpRequest.getHeaders().get(Constant.AUTHORIZATION);
-        if (CollectionUtils.isEmpty(authorizations) || StringUtils.isBlank(authorizations.get(0))) {
-            return null;
+    public static JSONObject verifyGet(ServerWebExchange exchange) {
+        String authorization = exchange.getRequest().getHeaders().getFirst(Constant.AUTHORIZATION);
+        if (authorization == null) {
+            throw new BusinessException(Constant.NOT_LOGIN, "未登录");
         }
-        return StringUtils.substring(authorizations.get(0), 6).trim();
-    }
-
-    /**
-     * 获取claims
-     *
-     * @param token
-     * @return
-     */
-    public static Claims getClaims(String token) {
+        if (!StringUtils.startsWith(authorization, Constant.BEARER)) {
+            throw new BusinessException(Constant.NOT_LOGIN, "Authorization格式错误");
+        }
+        String token = authorization.substring(Constant.BEARER.length());
         Claims claims;
         try {
-            //解析claims
             claims = Jwts.parser()
-                    .setSigningKey(jwtSigning.getBytes())
+                    .setSigningKey(jwtSigningKey)
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new BusinessException(Constant.NOT_LOGIN, "token过期");
+        } catch (UnsupportedJwtException e) {
+            throw new BusinessException(Constant.NOT_LOGIN, "不支持的token");
+        } catch (MalformedJwtException e) {
+            throw new BusinessException(Constant.NOT_LOGIN, "token格式错误");
+        } catch (SignatureException e) {
+            throw new BusinessException(Constant.NOT_LOGIN, "token签名异常");
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(Constant.NOT_LOGIN, "token非法请求");
         } catch (Exception e) {
-            return null;
+            log.error("解析异常：", e);
+            throw new BusinessException(Constant.NOT_LOGIN, "token解析异常");
         }
-        Date expiration = claims.getExpiration();
-        if (expiration == null || expiration.before(new Date())) {
-            return null;
+        JSONObject json = JSON.parseObject(claims.getSubject());
+        if (json == null) {
+            throw new BusinessException(Constant.NOT_LOGIN, "token数据不存在");
         }
-        return claims;
-    }
-
-    /**
-     * 校验token
-     *
-     * @param token
-     * @return
-     */
-    public static boolean verifyToken(String token) {
-        return getClaims(token) != null;
-    }
-
-    /**
-     * 获取用户ID
-     *
-     * @param request
-     * @return
-     */
-    public static String getUserId(ServerHttpRequest request) {
-        String token = getToken(request);
-        if (StringUtils.isBlank(token)) {
-            return null;
-        }
-        Claims claims = getClaims(token);
-        if (claims == null) {
-            return null;
-        }
-        Object userId = claims.get(Constant.HEADER_SA2_USER_ID);
-        if (userId == null) {
-            return null;
-        }
-        return userId.toString();
+        return json;
     }
 }

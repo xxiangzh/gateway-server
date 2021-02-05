@@ -25,7 +25,7 @@ k8s:
           # 命名空间((不建议修改))
           nameSpace: mg-tp-test
           # 应用容器端口
-          appContainerPort: 8004
+          appContainerPort: 7070
           # 创建实例数量(不建议修改)
           instanceNum: 1
           # JAVA_OPTS
@@ -41,7 +41,7 @@ k8s:
           # 命名空间(不建议修改)
           nameSpace: mg-tp-uat
           # 应用容器端口
-          appContainerPort: 8004
+          appContainerPort: 7070
           # 对外暴露端口(30000-32700之间)
           outputPort: 30508
           # 创建实例数量(不建议修改)
@@ -59,7 +59,7 @@ k8s:
           # 命名空间(不建议修改)
           nameSpace: data-center
           # 应用容器端口
-          appContainerPort: 8004
+          appContainerPort: 7070
           # 对外暴露端口(30000-32700之间)
           outputPort: 30505
           # 创建实例数量(不建议修改)
@@ -73,14 +73,6 @@ k8s:
             fileExtension: yaml
             namespace: xxx
             ramRoleName: KubernetesWorkerRole-zzz
-# 自动化测试配置
-testShell:
-          # 脚本地址(一定要带.git)
-          git: http://localhost:8062/test/property_cloud_platform.git
-          # 脚本地址凭证
-          gitCredentialsId: xxx
-          # 脚本文件位置
-          filePath: interfaceTest
 email:
     # 测试负责人邮件
     tester: anenan@qq.com

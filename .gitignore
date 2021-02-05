@@ -26,4 +26,3 @@ logs
 *.iml
 *.ipr
 log.*
-/src/main/resources/application-local.yml

@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path:
-  port: 8004
+  port: 7070
 
 service:
   registry:
@@ -23,7 +23,7 @@ spring:
     port: 6379
     password:
     timeout: 10000
-    database: 1
+    database: 8
     ttl: 60
     lettuce:
       pool:
@@ -51,12 +51,42 @@ spring:
             allowedHeaders: "*"
             allowedMethods: "*"
             maxAge: 86400
+      routes:
+        - id: 用户服务
+          uri: lb://user-server
+          predicates:
+            - Path=/user-server/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@apiKeyResolver}"
+                redis-rate-limiter.replenishRate: 2
+                # 每秒可以请求的次数
+                redis-rate-limiter.burstCapacity: 2
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+        - id: 订单服务
+          uri: lb://order-server
+          predicates:
+            - Path=/order-server/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@apiKeyResolver}"
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 2
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
 
 ribbon:
   eager-load:
     enabled: true
-  ReadTimeout: 30000
-  ConnectTimeout: 30000
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
   MaxAutoRetries: 0
   MaxAutoRetriesNextServer: 1
 
@@ -66,18 +96,16 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 60000
+            timeoutInMilliseconds: 10000
 
-#阿里云分布式配置中心
 alibaba:
   acm:
     group: ${group:DEFAULT_GROUP}
     endpoint: ${endpoint:acm.aliyun.com}
     fileExtension: ${fileExtension:yaml}
-    namespace: ${namespace:xxxx}
-    ramRoleName: ${ramRoleName:KubernetesWorkerRole-xxx}
+    namespace: ${namespace:52e0a4cb-7dc1-4346-bb1d-abd3eb4afdd0}
+    ramRoleName: ${ramRoleName:KubernetesWorkerRole-68f28ddc-6c89-41b4-9cef-5346700fa861}
 
-# 暴露监控端点
 management:
   endpoints:
     web:
@@ -91,23 +119,10 @@ management:
       show-details: always
 info: {status: ok}
 
-rocketmq:
-  name-server: http://xxx.mq-internet-access.mq-internet.aliyuncs.com:80
-  producer:
-    access-key: xxx
-    secret-key: zzz
-    group: hhh
-    sendMessageTimeout: 300000
-    topic:
-      log: saas-normal
-    tag:
-      log: message-log-dev
+jwt:
+  signing:
+    key: cf7031334895495582bf05fa6d2f57e1
 
-# 单点登录
-custom:
-  sso:
-    jwtSigningKey: xzxzxz
-
-global:
-  open:
-    paths: /*/info;/*/v2/api-docs;/*/open/api/**
+open:
+  path:
+    global: /*/v2/api-docs;/*/info;/*/open/**
