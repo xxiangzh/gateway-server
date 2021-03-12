@@ -2,6 +2,7 @@ package com.xzh.gateway.filter;
 
 
 import com.xzh.gateway.entity.Constant;
+import com.xzh.gateway.utils.TokenUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -30,7 +31,10 @@ public class RequestFilter implements GlobalFilter, Ordered {
                 .doOnNext(bytes -> {
                     // 将请求体存入Attributes
                     exchange.getAttributes().put(Constant.REQUEST_BODY_CACHE, bytes);
+                    // 请求时间
                     exchange.getAttributes().put(Constant.REQUEST_TIME_CACHE, System.currentTimeMillis());
+                    // 登录用户信息
+                    exchange.getAttributes().put(Constant.USER_TOKEN_CACHE, TokenUtils.get(exchange));
                 })
                 .then(chain.filter(exchange));
     }

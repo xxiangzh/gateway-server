@@ -55,7 +55,7 @@ public class ErrorWebExceptionHandler extends DefaultErrorWebExceptionHandler {
             errorAttributes.put("message", "服务暂不可用，请稍后重试");
         } else if (error instanceof TimeoutException) {
             errorAttributes.put("code", Constant.ERROR_CODE);
-            errorAttributes.put("message", "请求超时");
+            errorAttributes.put("message", "请求超时，请稍后重试");
         } else if (error instanceof ResponseStatusException) {
             errorAttributes.put("code", Constant.NOT_FOUND);
             errorAttributes.put("message", "404 NOT FOUND");

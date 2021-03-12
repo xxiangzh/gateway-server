@@ -3,6 +3,8 @@ package com.xzh.gateway.hystrix;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.xzh.gateway.entity.Constant.FALLBACK_MESSAGE;
+
 /**
  * 服务降级
  *
@@ -14,6 +16,6 @@ public class FallbackController {
 
     @RequestMapping("/fallback")
     public Object fallback() {
-        return "{\"code\":2,\"data\":null,\"message\":\"服务暂不可用\"}";
+        return FALLBACK_MESSAGE;
     }
 }

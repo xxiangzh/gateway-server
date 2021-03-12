@@ -3,8 +3,8 @@ package com.xzh.gateway.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xzh.gateway.entity.Constant;
-import com.xzh.gateway.error.BusinessException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,44 +29,30 @@ public class TokenUtils {
     }
 
     /**
-     * 验证并获取
+     * 获取token实例
      *
      * @param exchange
      * @return
      */
-    public static JSONObject verifyGet(ServerWebExchange exchange) {
+    public static JSONObject get(ServerWebExchange exchange) {
+        JSONObject jsonObject = new JSONObject();
         String authorization = exchange.getRequest().getHeaders().getFirst(Constant.AUTHORIZATION);
-        if (authorization == null) {
-            throw new BusinessException(Constant.NOT_LOGIN, "未登录");
+        if (authorization != null && StringUtils.startsWithIgnoreCase(authorization, Constant.BEARER)) {
+            String token = authorization.substring(Constant.BEARER.length());
+            try {
+                Claims claims = Jwts.parser()
+                        .setSigningKey(jwtSigningKey)
+                        .parseClaimsJws(token)
+                        .getBody();
+                JSONObject parseObject = JSON.parseObject(claims.getSubject());
+                if (parseObject != null) {
+                    jsonObject = parseObject;
+                }
+            } catch (Exception e) {
+                log.error("解析异常：", e);
+            }
         }
-        if (!StringUtils.startsWith(authorization, Constant.BEARER)) {
-            throw new BusinessException(Constant.NOT_LOGIN, "Authorization格式错误");
-        }
-        String token = authorization.substring(Constant.BEARER.length());
-        Claims claims;
-        try {
-            claims = Jwts.parser()
-                    .setSigningKey(jwtSigningKey)
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new BusinessException(Constant.NOT_LOGIN, "token过期");
-        } catch (UnsupportedJwtException e) {
-            throw new BusinessException(Constant.NOT_LOGIN, "不支持的token");
-        } catch (MalformedJwtException e) {
-            throw new BusinessException(Constant.NOT_LOGIN, "token格式错误");
-        } catch (SignatureException e) {
-            throw new BusinessException(Constant.NOT_LOGIN, "token签名异常");
-        } catch (IllegalArgumentException e) {
-            throw new BusinessException(Constant.NOT_LOGIN, "token非法请求");
-        } catch (Exception e) {
-            log.error("解析异常：", e);
-            throw new BusinessException(Constant.NOT_LOGIN, "token解析异常");
-        }
-        JSONObject json = JSON.parseObject(claims.getSubject());
-        if (json == null) {
-            throw new BusinessException(Constant.NOT_LOGIN, "token数据不存在");
-        }
-        return json;
+        return jsonObject;
+
     }
 }

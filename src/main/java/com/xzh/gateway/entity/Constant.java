@@ -2,7 +2,9 @@ package com.xzh.gateway.entity;
 
 import com.google.common.collect.Lists;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 常量类
@@ -24,7 +26,15 @@ public class Constant {
     public static final String ALL = "all";
     public static final String REQUEST_BODY_CACHE = "requestBodyCache";
     public static final String REQUEST_TIME_CACHE = "requestTimeCache";
+    public static final String USER_TOKEN_CACHE = "userTokenCache";
     public static final List<String> CONTENT_TYPES = Lists.newArrayList("application/json;charset=UTF-8", "text/plain;charset=UTF-8");
     public static final String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
+    public static final Map<String, Object> FALLBACK_MESSAGE = new HashMap<>(4);
 
+    static {
+        FALLBACK_MESSAGE.put("code", ERROR_CODE);
+        FALLBACK_MESSAGE.put("message", "服务暂不可用，请稍后重试!");
+        FALLBACK_MESSAGE.put("data", null);
+    }
 }
+

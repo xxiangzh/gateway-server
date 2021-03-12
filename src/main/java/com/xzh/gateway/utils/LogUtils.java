@@ -69,11 +69,11 @@ public class LogUtils {
      * @return
      */
     private static Long getUserId(ServerWebExchange exchange) {
-        try {
-            JSONObject jsonObject = TokenUtils.verifyGet(exchange);
-            return Long.parseLong(jsonObject.get("userId").toString());
-        } catch (Exception e) {
+        JSONObject userTokenCache = exchange.getAttribute(Constant.USER_TOKEN_CACHE);
+        if (userTokenCache == null) {
             return 0L;
+        } else {
+            return Long.parseLong(userTokenCache.get("userId").toString());
         }
     }
 

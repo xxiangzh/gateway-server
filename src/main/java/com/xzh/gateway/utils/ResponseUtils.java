@@ -1,8 +1,8 @@
 package com.xzh.gateway.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xzh.gateway.entity.Constant;
 import com.xzh.gateway.error.BusinessException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -28,12 +28,13 @@ public class ResponseUtils {
      * 返回response
      *
      * @param exchange
+     * @param code
      * @param message
      * @return
      */
-    public static Mono<Void> fail(ServerWebExchange exchange, String message) {
+    public static Mono<Void> fail(ServerWebExchange exchange, Integer code, String message) {
         Map<String, Object> resultMap = new HashMap<>(4);
-        resultMap.put("code", Constant.ERROR_CODE);
+        resultMap.put("code", code == null ? Constant.ERROR_CODE : code);
         resultMap.put("message", StringUtils.isBlank(message) ? Constant.ERROR_MESSAGE : message);
         resultMap.put("data", null);
         return Mono.defer(() -> {

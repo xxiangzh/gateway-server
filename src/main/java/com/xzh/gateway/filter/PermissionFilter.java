@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.xzh.gateway.entity.Constant;
 import com.xzh.gateway.utils.PermissionUtils;
 import com.xzh.gateway.utils.ResponseUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -27,20 +26,14 @@ public class PermissionFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String token = exchange.getRequest().getHeaders().getFirst(Constant.USER_TOKEN);
-        if (StringUtils.isBlank(token)) {
+        JSONObject userTokenCache = exchange.getAttribute(Constant.USER_TOKEN_CACHE);
+        if (userTokenCache == null || userTokenCache.isEmpty()) {
             return chain.filter(exchange);
         }
-        String permissionKey = JSONObject.parseObject(token).getString("permissionKey");
+        String permissionKey = userTokenCache.getString("permissionKey");
         String path = exchange.getRequest().getURI().getPath();
         Mono<Boolean> allowed = permissionUtils.isAllowed(permissionKey, path);
-        return allowed.flatMap(a -> {
-            if (a) {
-                return chain.filter(exchange);
-            } else {
-                return ResponseUtils.fail(exchange, "权限不足");
-            }
-        });
+        return allowed.flatMap(a -> a ? chain.filter(exchange) : ResponseUtils.fail(exchange, null, "权限不足"));
     }
 
     @Override
