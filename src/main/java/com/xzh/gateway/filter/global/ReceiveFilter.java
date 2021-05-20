@@ -1,4 +1,4 @@
-package com.xzh.gateway.filter;
+package com.xzh.gateway.filter.global;
 
 import com.xzh.gateway.entity.Constant;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -40,6 +40,6 @@ public class ReceiveFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -1;
+        return -97;
     }
 }

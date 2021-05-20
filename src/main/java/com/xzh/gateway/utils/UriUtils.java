@@ -39,4 +39,22 @@ public class UriUtils {
         }
         return false;
     }
+
+    /**
+     * 是否匹配接口（配置文件接口和请求接口匹配）
+     *
+     * @param config
+     * @param path
+     * @return
+     */
+    public static boolean isServiceMatchPath(String config, String path) {
+        if (StringUtils.isNotBlank(config)) {
+            for (String url : config.split(";")) {
+                if (ANT_PATH_MATCHER.match(url, path)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

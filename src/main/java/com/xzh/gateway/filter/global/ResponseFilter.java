@@ -1,8 +1,8 @@
-package com.xzh.gateway.filter;
+package com.xzh.gateway.filter.global;
 
+import com.google.common.base.Charsets;
 import com.xzh.gateway.entity.Constant;
 import com.xzh.gateway.utils.LogUtils;
-import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -71,6 +71,6 @@ public class ResponseFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -2;
+        return -98;
     }
 }

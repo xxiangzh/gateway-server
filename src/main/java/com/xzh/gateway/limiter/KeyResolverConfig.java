@@ -1,8 +1,8 @@
 package com.xzh.gateway.limiter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xzh.gateway.entity.Constant;
 import com.xzh.gateway.utils.IpUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +27,9 @@ public class KeyResolverConfig {
 
     private String getKey(ServerWebExchange exchange) {
         String path = exchange.getRequest().getURI().getPath();
-        String token = exchange.getRequest().getHeaders().getFirst(Constant.USER_TOKEN);
-        if (StringUtils.isNotBlank(token)) {
-            return path + token;
+        JSONObject userTokenCache = exchange.getAttribute(Constant.USER_TOKEN_CACHE);
+        if (userTokenCache != null && !userTokenCache.isEmpty()) {
+            return path + userTokenCache.toString();
         } else {
             return path + IpUtils.getIp(exchange);
         }

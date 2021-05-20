@@ -1,4 +1,4 @@
-package com.xzh.gateway.filter;
+package com.xzh.gateway.filter.global;
 
 
 import com.xzh.gateway.entity.Constant;
@@ -41,6 +41,6 @@ public class RequestFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -3;
+        return -99;
     }
 }

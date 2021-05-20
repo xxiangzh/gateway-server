@@ -57,6 +57,12 @@ spring:
           predicates:
             - Path=/user-server/**
           filters:
+            - name: Login
+              args:
+                notNeedLogin: /*/user/common/xxx
+            - name: Permission
+              args:
+                notNeedPermission: /*/user/info/xxx
             - name: RequestRateLimiter
               args:
                 key-resolver: "#{@apiKeyResolver}"
@@ -72,6 +78,8 @@ spring:
           predicates:
             - Path=/order-server/**
           filters:
+            - name: Login
+            - name: Permission
             - name: RequestRateLimiter
               args:
                 key-resolver: "#{@apiKeyResolver}"
