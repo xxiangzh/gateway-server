@@ -66,9 +66,13 @@ spring:
             - name: RequestRateLimiter
               args:
                 key-resolver: "#{@apiKeyResolver}"
-                redis-rate-limiter.replenishRate: 2
-                # 每秒可以请求的次数
-                redis-rate-limiter.burstCapacity: 2
+                redis-rate-limiter:
+                  # 每秒补充令牌数量
+                  replenishRate: 1
+                  # 令牌桶最大容量，突发请求数量
+                  burstCapacity: 10
+                  # 每次请求消耗令牌的数量（Hoxton及以上版本功能）
+                  requestedTokens: 10
             - name: Hystrix
               args:
                 name: fallbackcmd
